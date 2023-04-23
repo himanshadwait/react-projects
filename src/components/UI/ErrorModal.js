@@ -1,7 +1,3 @@
-
-// Backdrop is an overlay between the modal overlay and the actual page
-// so that we can't interact with the page while the modal is popped open.
-
 import React from "react";
 
 import Card from "./Card";
