@@ -15,8 +15,10 @@ the state and to then trigger such a re-render cycle.
 
 `index.js`: Creates the root of the application and renders app inside it.
 
-`const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);`
+```
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+```
 
 `App.js`: Renders `AddUser` and `UsersList` components. It also receives the data from
 `AddUser` component while lifting the state up and it also forwards `usersList` as an
@@ -25,8 +27,10 @@ function `setUsersList` that allows us to change the array and then that change 
 trigger the `App` component to be rerendered and hence the `UsersList` component would
 be updated as well since it's part of the `App` component.
 
-`<AddUser onAddUser={addUserHandler} />
-<UsersList users={usersList} />`
+```
+<AddUser onAddUser={addUserHandler} />
+<UsersList users={usersList} />
+```
 
 Unless a users prop is set here, the `users` remains undefined and
 renderer throws an error that `map` method cannot be used on undefined which we
@@ -48,11 +52,13 @@ with the use of a spread operator which simply pulls all elements out of
 that array and adds them as new elements to the new array and then a new
 element at the end is added as an object.
 
-`const addUserHandler = (userName, userAge) => {
+```
+const addUserHandler = (userName, userAge) => {
      setUsersList((prevUsersList) => {
        return [...prevUsersList, { name: userName, age: userAge, id: Math.random().toString()}];
     });
-};`
+};
+```
 
 `AddUser` : This component simply renders a `form` for the user to interact with. Inside the `form`
 it contains a `label` and an `input` with some props. We wrap this `form` inside a `Card` which is
@@ -60,12 +66,15 @@ our custom re-usable UI component. It also returns an `ErrorModal` which is simp
 a UI element. We also set three states to control the state of `enteredUsername`, `enteredAge`,
 and `error`.
 
-` const [enteredUsername, setEnteredUsername] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
-  const [error, setError] = useState();
-  // initial value is undefined`
+```
+ const [enteredUsername, setEnteredUsername] = useState("");
+ const [enteredAge, setEnteredAge] = useState("");
+ const [error, setError] = useState();
+  // initial value is undefined
+```
 
-`<div>
+```
+<div>
       {error && (
         <ErrorModal
           onConfirm={errorHandler}
@@ -75,7 +84,7 @@ and `error`.
         />
       )}
       {/* if error contains the current state snapshot of error state then ErrorModal gets rendered */}
-      {/* else nothing happens. The only way of getting rid of the modal is to reset error to 
+      {/* else nothing happens. The only way of getting rid of the modal is to reset error to
       undefined or to null*/}
       <Card className={styles.input}>
         {/* Card is our custom component therefore it's only able to work with the props that we
@@ -97,9 +106,11 @@ and `error`.
           />
           {/* value prop here reflects the current state snapshot of username and age inputs. */}
           <Button type="submit">Add User</Button>
-          {/* When we click this Add User Button and hence the addUserHandler in the 
+          {/* When we click this Add User Button and hence the addUserHandler in the
         AddUser component runs we forward the enteredUsername and enteredAge to the App component
         and we do this with props as well. */}
         </form>
       </Card>
-    </div>`
+    </div>
+
+```
