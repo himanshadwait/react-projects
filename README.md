@@ -83,12 +83,15 @@ and `error`.
           message={error.message}
         />
       )}
-      {/* if error contains the current state snapshot of error state then ErrorModal gets rendered */}
-      {/* else nothing happens. The only way of getting rid of the modal is to reset error to
-      undefined or to null*/}
+
+      {/* if error contains the current state snapshot of error state then
+      ErrorModal gets rendered, else nothing happens. The only way of getting
+      rid of the modal is to reset error to undefined or to null*/}
+
       <Card className={styles.input}>
-        {/* Card is our custom component therefore it's only able to work with the props that we
-    use inside this component. */}
+        {/* Card is our custom component therefore it's only able to work with
+        the props that we use inside this component. */}
+
         <form onSubmit={addUserHandler}>
           <label htmlFor="username">Username</label>
           <input
@@ -104,11 +107,15 @@ and `error`.
             value={enteredAge}
             onChange={ageChangeHandler}
           />
+
           {/* value prop here reflects the current state snapshot of username and age inputs. */}
+
           <Button type="submit">Add User</Button>
+
           {/* When we click this Add User Button and hence the addUserHandler in the
         AddUser component runs we forward the enteredUsername and enteredAge to the App component
         and we do this with props as well. */}
+
         </form>
       </Card>
     </div>
