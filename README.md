@@ -321,3 +321,110 @@ const Card = (props) => {
   );
 };
 ```
+
+### Limitations of JSX
+
+We can't return more than one "root" JSX element (We also can't store more than
+one "root" JSX element in a variable).
+The workaround is to wrap all the JSX code in a `<div>` or some other custom
+component. This problem can be solved simply by wrapping the adjacent element
+with a `<div>`. This way we only have one thing that we return. Instead of using
+a `<div>` we could use a native JavaScript array and all the adjacent elements
+inside are separated by commasbut it has a gotcha. Whenever we're working with an
+array of JSX elements, React wants a "key" on every element.
+
+```
+return (
+    [
+      error && (
+        <ErrorModal
+          key="error-modal"
+          onConfirm={errorHandler}
+          title={error.title}
+          message={error.message}
+        />
+      ),
+      <Card key="add-user-card" className={styles.input}>
+        <form onSubmit={addUserHandler}>
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            value={enteredUsername}
+            onChange={usernameChangeHandler}
+          />
+          <label htmlFor="age">Age (Years)</label>
+          <input
+            id="age"
+            type="number"
+            value={enteredAge}
+            onChange={ageChangeHandler}
+          />
+          <Button type="submit">Add User</Button>
+        </form>
+      </Card>
+    ]
+  );
+};
+```
+
+However, with the wrapping `<div>` or generally any wrapping element, there's
+a new problem. **We can end up with `<div>` soup**. We can end up with a real
+DOM that's being rendered where we have many nested React components and all
+those components for various reasons need wrapping `<div>`s or other wrapping
+components and we have all these unnecessary `<div>`s being rendered in the
+real DOM even though they're only there because of this requirement or this
+limitation of JSX. In bigger apps, we can easily end up with **tons of
+unnecessary `<div>`s** or other elements which add **no semantic meaning or
+structure** to the page but **are only there because of React's/JSX' requirement**.
+Rendering unnecessary elements generally is never a good idea in programming hence
+this wrapping `<div>` approach is okay but not ideal. A dirty little workaround is
+creating a helper wrapper component.
+
+We can create a `Wrapper` component which is just an empty component and it only returns
+`props.children`. This is enough to fulfill the requirement JSX has. We can use this as
+a Wrapper.
+
+```
+const Wrapper = (props) => {
+    return props.children;
+    //Children prop holds all the content we're passing between the opening and closing tag
+    //of our custom component.
+}
+```
+
+The `AddUser` return code looks now like:
+
+```
+return (
+    <Wrapper>
+      {error && (
+        <ErrorModal
+          onConfirm={errorHandler}
+          title={error.title}
+          message={error.message}
+        />
+      )}
+      <Card className={styles.input}>
+        <form onSubmit={addUserHandler}>
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            value={enteredUsername}
+            onChange={usernameChangeHandler}
+          />
+          <label htmlFor="age">Age (Years)</label>
+          <input
+            id="age"
+            type="number"
+            value={enteredAge}
+            onChange={ageChangeHandler}
+          />
+          <Button type="submit">Add User</Button>
+        </form>
+      </Card>
+    </Wrapper>
+  );
+};
+```
