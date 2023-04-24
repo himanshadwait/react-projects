@@ -547,7 +547,7 @@ into the web browser. React itself doesn't care wheter you run it in an
 environment that has a DOM or if you would use it to build a native app.
 React DOM is kind of the adapter for React to the browser.
 
-ReactDOM.createPortal() takes two arguments. The first one is the React node that should
+`ReactDOM.createPortal()` takes two arguments. The first one is the React node that should
 be rendered (it wants JSX). Second argument is a pointer to that container in the real
 DOM where the elements should be rendered in.
 
@@ -691,6 +691,6 @@ This approach of using Refs to interact with DOM elements, specifically with
 `<input>` elements also has a special name which is **uncontrolled components**
 because we're not controlling the state of the input elements with react. When we use
 Refs, we have uncontrolled input components, the approach where we managed our state
-and we updated that state on every keystroke and we feed that state back into input
+and we updated that state on every keystroke and we fed that state back into input
 with the value prop, was **controlled approach**. Those input fields were
 **Controlled Components** because their internal state was controlled by React.
