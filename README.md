@@ -428,3 +428,269 @@ return (
   );
 };
 ```
+
+This Wrapper component is actually not a component that we need to build on
+our own instead it comes with React. There it's the `fragment` component which
+can be accessed by `React.Fragment` or we can just `import Fragment from React`
+The following will always work and this is same as our wrapper component.:
+
+```
+return (
+  <React.Fragment>
+    <h2>Hi There!</h2>
+    <p>This always work :-</p>
+  <React.Fragement>
+);
+```
+
+This can be used in some cases:
+
+```
+return (
+  <>
+    <h2>Hi There!</h2>
+    <p>This does work</p>
+  </>
+);
+```
+
+We use this built-in wrapper in the `App` component.
+
+```
+return (
+    <React.Fragment>
+      <AddUser onAddUser={addUserHandler} />
+      <UsersList users={usersList} />
+    </React.Fragment>
+  );
+```
+
+Fragments allow us to write cleaner code, to end up with less unnecessary
+HTML elements.
+
+### React Portals
+
+Let's say we have the following code:
+
+```
+return (
+  <React.Fragment>
+    <MyModal />
+    <MyInputForm />
+  <React.Fragment>
+)
+```
+
+Which in `RealDOM` looks like this:
+
+```
+<section>
+    <h2> Some other content</h2>
+    <div class="my-modal">
+      <h2>A Modal Title!</h2>
+    </div>
+    <form>
+      <label>Username</label>
+      <input type="text" />
+    </form>
+</section>
+```
+
+Semantically and from a "clean HTML structure" perspective, having this
+nested modal isn't ideal. It is an **overlay to the entire page** after all,
+so logically it's above everything else. This is similar for side-drawers,
+dialogues and for all kinds of overlays or any related components.
+
+It is like styling a `<div>` like a `<button>` and adding an event listener to it:
+it'll work, but it's not a good practice.
+
+```
+<div onClick={clickHandler}>ClickMe, I am a bad button!</div>
+```
+
+We can use the React portals to get rid of the problem of overlay content which
+shouldn't be deeply nested. The RealDOM will then look like this:
+
+```
+<div class="my-modal">
+    <h2>A Modal Title!</h2>
+</div>
+<section>
+    <h2> Some other content</h2>
+    <form>
+      <label>Username</label>
+      <input type="text" />
+    </form>
+</section>
+
+```
+
+Portals need two things:
+
+1. You need a place you want to port the components to
+2. You need to let the component know that it should have a
+   portal to that place.
+   The place can be the index.html file above the main `root` of the app:
+
+```
+<body>
+    <div id="backdrop-root"></div>
+    <div id="overlay-root"></div>
+    <div id="root"></div>
+    <script src="../src/index.js" type="text/JSX"></script>
+</body>
+```
+
+React is the library that has all the React features, state management, and so
+on, baked in and React DOM uses that React to bring that logic and these features
+into the web browser. React itself doesn't care wheter you run it in an
+environment that has a DOM or if you would use it to build a native app.
+React DOM is kind of the adapter for React to the browser.
+
+ReactDOM.createPortal() takes two arguments. The first one is the React node that should
+be rendered (it wants JSX). Second argument is a pointer to that container in the real
+DOM where the elements should be rendered in.
+
+```
+ {ReactDOM.createPortal(
+        <Backdrop onConfirm={props.onConfirm} />,
+        document.getElementById("backdrop-root")
+      )}
+```
+
+There was an element selected like this in the index.js where we also
+rendered the root component with the render method into a place
+selected by with getElementById. Now we're not rendering an element
+there but instead inside of an existing application, which is
+already being rendered by the React, we portal, we move the HTML content
+that is about to be rendered into a different place.
+
+### React References "refs":
+
+In their most basic form, refs allow us to get access to other DOM elements and
+work with them.
+In `AddUser` component:
+
+```
+  setEnteredUsername("");
+    // We use the state to reset the inputs
+    setEnteredAge("");
+  };
+
+  const usernameChangeHandler = (event) => {
+    setEnteredUsername(event.target.value);
+  };
+
+  const ageChangeHandler = (event) => {
+    setEnteredAge(event.target.value);
+  };
+```
+
+With every keystroke, we update the value we get by the user and we store in our state
+and we feed that state back to the <input>. Then we use the state to reset the inputs.
+But updating the state with every keystroke when we only need it when we submit the form
+sounds a bit redundent.
+With refs we can set up a connection between a HTML element that is being rendered in the
+end and our other JavaScript code. We create a ref with use of another react hook, we use
+the useRef hook. Like other react hooks it is used inside functional component. It takes a
+value we want to initialize it to. It returns a value which allows us to work with that ref
+later, work with that element to which we're going to connect it. `nameInputRef` connect this
+ref with the first input which allows us to enter a username. `ageInputRef` connect the
+second ref to the second input which allows us to enter the age.
+We can let React know that we want to connect a ref to a HTMl element by going to that
+element and adding a special built-in prop named ref. This ref props connects the `nameInputRef`
+to the input. This ref returned by the `useRef` hook
+is always an object and always has a `current` prop and this prop holds the actual value
+that ref is connected with and hence it's actually the `<input>` which is being stored in as
+a value the `current` prop. The current prop stores the actual DOM node, which could now
+be manipulated and be done all kinds of things with.
+In `nameInputRef.current.value` current refers to the value stored and the value stored is the
+`<input>` element and every `<input>` element has a `value` property in JavaScript.
+
+Now `AddUser` function looks like:
+
+```
+const AddUser = (props) => {
+  const nameInputRef = useRef();
+  const ageInputRef = useRef();
+
+  const [error, setError] = useState();
+
+  const addUserHandler = (event) => {
+    const enteredUsername = nameInputRef.current.value; //Reading the input data
+    const enteredAge = ageInputRef.current.value;
+    event.preventDefault();
+
+    if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
+      setError({
+        title: "Invalid Input",
+        message: "Please enter a valid name and age (non-empty values) !",
+      });
+
+      return;
+    }
+    if (+enteredAge < 1) {
+      setError({
+        title: "Invalid Age",
+        message: "Please enter a valid age (> 0) !",
+      });
+      return;
+    }
+
+    props.onAddUser(enteredUsername, enteredAge);
+  };
+
+  const errorHandler = () => {
+    setError(null);
+  };
+
+  return (
+    <Wrapper>
+      {error && (
+        <ErrorModal
+          onConfirm={errorHandler}
+          title={error.title}
+          message={error.message}
+        />
+      )}
+      <Card className={styles.input}>
+        <form onSubmit={addUserHandler}>
+          <label htmlFor="username">Username</label>
+          <input id="username" type="text" ref={nameInputRef} />
+          <label htmlFor="age">Age (Years)</label>
+          <input id="age" type="number" ref={ageInputRef} />
+          <Button type="submit">Add User</Button>
+        </form>
+      </Card>
+    </Wrapper>
+  );
+};
+```
+
+With this we are able to get our user inputs but we've lost our resetting logic. To bring
+it back we either can switch back to our state based solution or we can do something
+which we should rarely do but which, in the context of a input field value is okay. We can
+manipulate the DOM without react. We typically shouldn't do that but if we just want to reset
+the value entered by the user, it is something that we can consider doing.
+
+```
+
+    props.onAddUser(enteredUsername, enteredAge);
+    // To reset the input after submission, we manipulate the DOM.
+    nameInputRef.current.value = "";
+    ageInputRef.current.value = "";
+
+```
+
+This should be rarely done. Rarely we should use Refs to manipulate the DOM.
+If you just want to read a value, Refs are probably better. But in the above
+case Refs offer lesser code but there's an edge case of manipulating the DOM.
+State is definitely cleaner but it is a bit of more code.
+
+This approach of using Refs to interact with DOM elements, specifically with
+`<input>` elements also has a special name which is **uncontrolled components**
+because we're not controlling the state of the input elements with react. When we use
+Refs, we have uncontrolled input components, the approach where we managed our state
+and we updated that state on every keystroke and we feed that state back into input
+with the value prop, was **controlled approach**. Those input fields were
+**Controlled Components** because their internal state was controlled by React.
